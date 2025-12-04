@@ -15,6 +15,7 @@ export class UsersController {
       name: firebaseUser.name ?? '',
       avatar: firebaseUser.picture ?? '',
       createdAt: firebaseUser.auth_time,
+      phoneNumber: firebaseUser.phoneNumber
     };
   }
 }
