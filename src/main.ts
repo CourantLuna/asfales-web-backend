@@ -11,7 +11,7 @@ async function bootstrap() {
 ];
 
   app.enableCors({
-    origin: 'http://localhost:3000',   // frontend
+    origin: process.env.FRONTEND_URL,   // frontend
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
