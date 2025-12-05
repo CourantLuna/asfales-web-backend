@@ -22,8 +22,6 @@ const port = Number(process.env.PORT) || 3001;
 
   console.log("🔥 NODE_ENV:", process.env.NODE_ENV);
 console.log("📄 Using PORT:", process.env.PORT);
-console.log("📄 Using PORT:", process.env.FIREBASE_PROJECT_ID);
-
 
 }
 bootstrap();

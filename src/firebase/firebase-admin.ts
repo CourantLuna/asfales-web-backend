@@ -19,8 +19,6 @@ config(); // 🔥 Carga variables de .env
     client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   };
 
-  console.log("process.env.FIREBASE_TYPE", process.env.FIREBASE_TYPE);
-
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
   });
