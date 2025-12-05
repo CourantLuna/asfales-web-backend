@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { admin } from '../firebase/firebase-admin';
 import { RegisterUserDto } from '../dto/register-user.dto';
 
@@ -35,7 +35,7 @@ export class AuthService {
       };
     } catch (error) {
       console.error(error);
-      throw new Error('Error registrando el usuario en Firebase: ' + error.message);
+    throw new BadRequestException(error.message || 'Error registrando usuario');
     }
   }
 

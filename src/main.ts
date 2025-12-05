@@ -21,8 +21,8 @@ const port = Number(process.env.PORT) || 3001;
 
   await app.listen(port);
 
-  console.log("🔥 NODE_ENV:", process.env.NODE_ENV);
-console.log("📄 Using PORT:", process.env.PORT);
+//   console.log("🔥 NODE_ENV:", process.env.NODE_ENV);
+// console.log("📄 Using PORT:", process.env.PORT);
 
 }
 bootstrap();
