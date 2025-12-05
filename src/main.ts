@@ -7,11 +7,12 @@ async function bootstrap() {
   const allowedOrigins = [
   'http://localhost:3000',
   process.env.FRONTEND_URL,
+  'https://asfales-web-frontend.vercel.app',
   /\.vercel\.app$/,
 ];
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL,   // frontend
+    origin: allowedOrigins,   // frontend
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
