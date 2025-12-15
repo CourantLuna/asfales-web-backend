@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { admin } from '../firebase/firebase-admin';
-import { RegisterUserDto } from '../dto/register-user.dto';
+import { admin } from '../../firebase/firebase-admin';
+import { RegisterUserDto } from '../../dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
