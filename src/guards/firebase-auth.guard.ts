@@ -1,30 +1,30 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { admin } from '../firebase/firebase-admin';
+// src/guards/firebase-auth.guard.ts
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers.authorization?.split('Bearer ')[1];
 
-    const header = req.headers['authorization'];
-    if (!header) {
-      throw new UnauthorizedException('Missing Authorization header');
+    if (!token) {
+      throw new UnauthorizedException('No se proporcionó token');
     }
-
-    const token = header.split(' ')[1]; // Bearer <token>
 
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
-      req.user = decodedToken;
+      request.user = decodedToken;
       return true;
     } catch (error) {
-      console.error(error);
-      throw new UnauthorizedException('Invalid Firebase token');
+      console.log("Error de Auth:", error.code); // Para debug
+
+      // Si el token expiró, lanzamos 401 explícitamente
+      if (error.code === 'auth/id-token-expired') {
+        throw new UnauthorizedException('El token ha expirado');
+      }
+      
+      throw new UnauthorizedException('Token inválido');
     }
   }
 }

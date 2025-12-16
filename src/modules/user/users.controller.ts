@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FirebaseAuthGuard } from '../../guards/firebase-auth.guard';
 
@@ -11,4 +11,22 @@ export class UsersController {
   async getProfile(@Param('uid') uid: string) {
     return this.userService.getUserProfile(uid);
   }
+
+  @Put(':uid') 
+  async updateProfile(
+    @Param('uid') uid: string, 
+    @Body() body: any // Recibe el JSON con los campos a cambiar
+  ) {
+    // Delegamos al servicio
+    return this.userService.updateUserProfile(uid, body);
+  }
+
+  // ... imports
+@Patch(':uid/avatar')
+async updateAvatar(
+  @Param('uid') uid: string, 
+  @Body() body: { photoURL: string }
+) {
+  return this.userService.updateAvatar(uid, body.photoURL);
+}
 }
