@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SheetsService } from '../sheets/sheets.service';
-import { admin } from 'src/firebase/firebase-admin';
+import { admin } from '../../firebase/firebase-admin';
 
 @Injectable()
 export class UserService {
