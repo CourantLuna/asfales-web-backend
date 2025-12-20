@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config'; 
 import { SheetsModule } from './modules/sheets/sheets.module';
 import { UserModule } from './modules/user/user.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 @Module({
   imports: [AuthModule, 
@@ -13,7 +14,7 @@ import { UserModule } from './modules/user/user.module';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'], // .env.local si NODE_ENV=local
     }),
-    SheetsModule, UserModule
+    SheetsModule, UserModule, FavoritesModule
   ],
   controllers: [AppController,UsersController],
   providers: [AppService],

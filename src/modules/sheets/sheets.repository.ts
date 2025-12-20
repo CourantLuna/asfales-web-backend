@@ -52,4 +52,28 @@ export class SheetsRepository {
       requestBody: { values: [data] },
     });
   }
+
+async deleteRow(spreadsheetId: string, sheetId: number, rowIndex: number) {
+  try {
+    await this.sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId: sheetId,
+                dimension: "ROWS",
+                startIndex: rowIndex, // El índice es inclusivo
+                endIndex: rowIndex + 1, // El índice es exclusivo
+              },
+            },
+          },
+        ],
+      },
+    });
+  } catch (err) {
+    throw new InternalServerErrorException("Error eliminando fila en Google Sheet");
+  }
+}
 }

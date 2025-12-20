@@ -1,6 +1,7 @@
 // src/modules/sheets/sheets.service.ts
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { SheetsRepository } from "./sheets.repository";
+import { getSheetsClient } from "src/common/sheets.client";
 
 @Injectable()
 export class SheetsService {
@@ -92,7 +93,48 @@ export class SheetsService {
     return updated;
   }
 
+/**
+   * ELIMINACIÓN FÍSICA ACTUALIZADA
+   */
   async delete(spreadsheetId: string, sheetName: string, id: string, keyColumn: string = 'id') {
+    // 1. Obtener datos para localizar la fila
+    const { headers, rows } = await this.repo.read(spreadsheetId, sheetName);
+    const cleanHeaders = headers.map(h => h.trim().toLowerCase());
+    const idIndex = cleanHeaders.indexOf(keyColumn.toLowerCase());
+
+    if (idIndex === -1) throw new BadRequestException(`La columna '${keyColumn}' no existe`);
+
+    // 2. Encontrar el índice (sumamos 1 porque la API de Sheets cuenta desde la fila de headers)
+    const rowIndex = rows.findIndex(r => r[idIndex] === id);
+    if (rowIndex === -1) throw new NotFoundException(`Registro con ${keyColumn}=${id} no encontrado para eliminar`);
+
+    // 3. Obtener el sheetId (ID numérico de la pestaña)
+    const sheetId = await this.getSheetIdByName(spreadsheetId, sheetName);
+
+    // 4. Llamar al repositorio para eliminar la dimensión (fila)
+    // Se usa rowIndex + 1 porque los datos en 'rows' no incluyen el header (que es la fila 0)
+    await this.repo.deleteRow(spreadsheetId, sheetId, rowIndex + 1);
+
+    return { success: true, deletedId: id, message: "Fila eliminada permanentemente" };
+  }
+
+  /**
+   * Helper para obtener el GID (sheetId) de la pestaña por su nombre
+   */
+  private async getSheetIdByName(spreadsheetId: string, sheetName: string): Promise<number> {
+    const client = getSheetsClient();
+    const spreadsheet = await client.spreadsheets.get({ spreadsheetId });
+    const sheet = spreadsheet.data.sheets?.find(s => s.properties?.title === sheetName);
+    
+    if (!sheet) throw new NotFoundException(`No se encontró la pestaña llamada '${sheetName}'`);
+    
+    return sheet.properties?.sheetId || 0;
+  }
+
+  
+  
+  //deshabilitar item/registro
+  async disable(spreadsheetId: string, sheetName: string, id: string, keyColumn: string = 'id') {
     return this.update(spreadsheetId, sheetName, id, { active: "false" }, keyColumn);
   }
 
