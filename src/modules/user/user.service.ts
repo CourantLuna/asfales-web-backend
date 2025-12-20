@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SheetsService } from '../sheets/sheets.service';
 import { admin } from '../../firebase/firebase-admin';
 
@@ -105,14 +105,30 @@ export class UserService {
     }
   }
 
-  async updateAvatar(uid: string, photoURL: string) {
-  try {
-    // Actualizamos directamente en Firebase Auth
-    await admin.auth().updateUser(uid, { photoURL });
-    return { success: true, photoURL };
-  } catch (error) {
-    throw new Error(`Error actualizando avatar: ${error.message}`);
+async updateAvatar(uid: string, photoURL: string) {
+    try {
+      // 1. Intentar actualizar en Firebase Auth
+      await admin.auth().updateUser(uid, { photoURL });
+      
+      // 2. Si manejas una base de datos (Google Sheets), deberías actualizarla aquí también
+      // await this.sheetsService.updateColumn(..., { avatar: photoURL });
+
+      return { 
+        success: true, 
+        message: 'Avatar actualizado correctamente', 
+        photoURL 
+      };
+    } catch (error: any) {
+      console.error("Firebase Error detallado:", error);
+
+      // Si el error es que el usuario no existe en Firebase
+      if (error.code === 'auth/user-not-found') {
+        throw new BadRequestException('El usuario no existe en el sistema de autenticación.');
+      }
+
+      // Para cualquier otro error de Firebase, enviamos el mensaje técnico al frontend
+      throw new BadRequestException(`Error de Firebase: ${error.message}`);
+    }
   }
-}
   
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FirebaseAuthGuard } from '../../guards/firebase-auth.guard';
+import { Post } from '@nestjs/common';
 
 @Controller('perfil') // Esto define la ruta base: http://localhost:3001/perfil
 export class UsersController {
@@ -10,6 +11,24 @@ export class UsersController {
   @Get(':uid') // Esto completa la ruta: /perfil/:uid
   async getProfile(@Param('uid') uid: string) {
     return this.userService.getUserProfile(uid);
+  }
+
+  @Post('create-initial')
+  // @UseGuards(FirebaseAuthGuard) // Descomenta si usas guardias de Firebase
+  async createInitial(@Body() data: { 
+    uid: string; 
+    email?: string; 
+    displayName?: string; 
+    phone?: string; 
+  }) {
+    console.log(`🚀 Creando perfil inicial para UID: ${data.uid}`);
+    
+    return await this.userService.createInitialProfile(
+      data.uid,
+      data.email,
+      data.displayName,
+      data.phone,
+    );
   }
 
   @Put(':uid') 
