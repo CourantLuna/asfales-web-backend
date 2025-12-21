@@ -130,5 +130,52 @@ async updateAvatar(uid: string, photoURL: string) {
       throw new BadRequestException(`Error de Firebase: ${error.message}`);
     }
   }
+
+// 👇 Método para procesar la recarga
+  async rechargeBalance(uid: string, amount: number, paymentMethodId?: string) {
+    try {
+      // 1. Obtener el perfil actual
+      const currentProfile = await this.getUserProfile(uid);
+
+      if (!currentProfile) {
+        throw new NotFoundException(`Perfil con UID ${uid} no encontrado`);
+      }
+
+      // 2. Parsear el loyalty_json (Manejo de errores por si el campo está vacío o corrupto)
+      let loyaltyData;
+      try {
+        loyaltyData = currentProfile.loyalty_json 
+          ? JSON.parse(currentProfile.loyalty_json) 
+          : { tier: 'Blue', pointsBalance: 0, tierPoints: 0, creditsBalance: 0 };
+      } catch (e) {
+        // Si falla el parseo, iniciamos valores en 0 para no romper la app
+        loyaltyData = { tier: 'Blue', pointsBalance: 0, tierPoints: 0, creditsBalance: 0 };
+      }
+
+      // 3. Sumar el saldo (asegurando tipo Number)
+      const currentCredits = Number(loyaltyData.creditsBalance) || 0;
+      const amountToAdd = Number(amount);
+      
+      loyaltyData.creditsBalance = currentCredits + amountToAdd;
+
+      // 4. Convertir de nuevo a String para guardar en Sheet
+      const updates = {
+        loyalty_json: JSON.stringify(loyaltyData)
+      };
+
+      // 5. Guardar actualización
+      await this.updateUserProfile(uid, updates);
+
+      return {
+        success: true,
+        newBalance: loyaltyData.creditsBalance,
+        message: 'Saldo recargado exitosamente'
+      };
+
+    } catch (error) {
+      console.error('Error recargando saldo:', error);
+      throw error;
+    }
+  }
   
 }
