@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SheetsModule } from './modules/sheets/sheets.module';
 import { UserModule } from './modules/user/user.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [AuthModule, 
@@ -14,7 +15,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'], // .env.local si NODE_ENV=local
     }),
-    SheetsModule, UserModule, FavoritesModule
+    SheetsModule, UserModule, FavoritesModule, BookingsModule
   ],
   controllers: [AppController,UsersController],
   providers: [AppService],
