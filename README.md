@@ -1,98 +1,78 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+# Asfales Web - Backend API
+
+<p align="left">
+  <a href="http://nestjs.com/" target="blank"><img src="https://wfcc6kelz9zexsot.public.blob.vercel-storage.com/20-vRibJMLzjhkcZHiTmRHZbI477Lks4r.png" width="60" alt="Asales Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="60" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![Vercel](https://vercelbadge.vercel.app/api/CourantLuna/asfales-web-backend)
+![NestJS](https://img.shields.io/badge/NestJS-10-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API RESTful robusta construida con **NestJS** que sirve como el núcleo lógico de la plataforma Asfales. Se caracteriza por utilizar **Google Sheets** como capa de persistencia (Base de Datos) y **Firebase** para la validación de seguridad.
 
-## Description
+🔗 **Base URL:** [https://asfales-web-backend.vercel.app/](https://asfales-web-backend.vercel.app/)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🧠 Arquitectura y Módulos
 
-## Project setup
+La aplicación sigue una arquitectura modular escalable:
 
-```bash
-$ npm install
-```
+* **AppModule:** Módulo raíz que orquesta la configuración.
+* **SheetsModule:** Servicio centralizado que abstrae la API de Google Sheets. Funciona como un ORM personalizado permitiendo métodos `find`, `create`, `update`, `delete` sobre filas de Excel.
+* **AuthModule:** Middleware y Guards para validar tokens JWT de Firebase.
+* **UserModule:** Gestión de perfiles de usuario, lógica de actualización de JSONs complejos (Lealtad, Pagos) y cálculo de puntos.
+* **BookingsModule:** Creación y consulta de reservas.
+* **FavoritesModule:** Gestión de listas de deseos.
 
-## Compile and run the project
+## 💾 Estrategia de Base de Datos
 
-```bash
-# development
-$ npm run start
+El sistema no utiliza SQL ni NoSQL tradicional. Utiliza **Google Sheets** mediante una Service Account.
+* Cada "Hoja" (Tab) en el Spreadsheet actúa como una tabla.
+* Los datos complejos (Direcciones, Preferencias) se almacenan como **JSON Strings** dentro de celdas específicas, permitiendo estructuras flexibles dentro de un formato rígido.
 
-# watch mode
-$ npm run start:dev
+## 🚀 Instalación y Ejecución
 
-# production mode
-$ npm run start:prod
-```
+1.  **Clonar repositorio:**
+    ```bash
+    git clone [https://github.com/CourantLuna/asfales-web-backend.git](https://github.com/CourantLuna/asfales-web-backend.git)
+    ```
 
-## Run tests
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
 
-```bash
-# unit tests
-$ npm run test
+3.  **Configurar Variables de Entorno:**
+    El sistema requiere credenciales críticas de Google Cloud. Crea un archivo `.env`:
+    ```env
+    # Google Sheets Credentials
+    GOOGLE_PROJECT_ID=tu-project-id
+    GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+    GOOGLE_CLIENT_EMAIL=tu-service-account@...
 
-# e2e tests
-$ npm run test:e2e
+    # Spreadsheet IDs (Tablas)
+    SPREADSHEET_ID_USER=1T4Vtp2QAE30iNh4vc4DkzV0TRmHio0FcORpqx59G2E0
+    # ... otros IDs de hojas
+    ```
 
-# test coverage
-$ npm run test:cov
-```
+4.  **Ejecutar en desarrollo:**
+    ```bash
+    npm run start:dev
+    ```
 
-## Deployment
+## 📡 Endpoints Principales
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Usuarios
+* `GET /perfil/:uid` - Obtener perfil completo.
+* `PUT /perfil/:uid` - Actualizar datos (acepta partial updates).
+* `PATCH /perfil/:uid/recharge` - Recargar saldo en billetera.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Reservas
+* `POST /bookings` - Crear nueva reserva (Desencadena lógica de lealtad).
+* `GET /bookings/user/:uid` - Obtener historial.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+### Sheets (Genérico - Admin)
+* `GET /sheets/:id/:range` - Lectura directa (protegida).
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 👥 Equipo
+Desarrollado por el Heydi García Sánchez - Proyecto Asfales.
