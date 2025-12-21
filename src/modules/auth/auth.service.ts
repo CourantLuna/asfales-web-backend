@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { admin } from '../../firebase/firebase-admin';
 import { RegisterUserDto } from '../../dto/register-user.dto';
 import { UserService } from '../user/user.service';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -81,6 +82,52 @@ constructor(private readonly userService: UserService) {}
       throw new BadRequestException(
         error.message || 'No se pudo actualizar la contraseña',
       );
+    }
+  }
+
+  // 👇 NUEVO MÉTODO PARA LOGIN (SWAGGER HELPER)
+  async login(loginDto: LoginUserDto) {
+    const { email, password } = loginDto;
+    
+    const apiKey = process.env.FIREBASE_API_KEY;
+
+    if (!apiKey) {
+      throw new BadRequestException('FIREBASE_API_KEY no configurada en el backend (.env)');
+    }
+
+    try {
+      // Llamamos a la API REST de Firebase Auth
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new UnauthorizedException(data.error?.message || 'Credenciales inválidas');
+      }
+
+      // Retornamos el token que necesitas para Swagger
+      return {
+        idToken: data.idToken, // 👈 ESTE es el token para el botón "Authorize"
+        email: data.email,
+        refreshToken: data.refreshToken,
+        expiresIn: data.expiresIn,
+        localId: data.localId,
+      };
+
+    } catch (error) {
+      console.error(error);
+      throw new UnauthorizedException('Error al iniciar sesión: ' + error.message);
     }
   }
 }

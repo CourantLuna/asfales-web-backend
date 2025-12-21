@@ -22,6 +22,7 @@ config(); // 🔥 Carga variables de .env
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
   });
+  
 }
 
 export { admin };
