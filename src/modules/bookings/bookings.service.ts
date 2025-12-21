@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SheetsService } from '../sheets/sheets.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { v4 as uuidv4 } from 'uuid'; // Asegúrate de tener uuid instalado o usa Date.now()
 
 @Injectable()
 export class BookingsService {
@@ -82,6 +81,37 @@ export class BookingsService {
       'id'
     );
     return this.mapRowToBooking(booking);
+  }
+
+  /**
+   * Actualiza una reserva existente (Para cancelar, editar, etc.)
+   */
+  async update(id: string, changes: Record<string, any>) {
+    // 1. Preparamos el payload con la fecha de actualización
+    const payload: Record<string, any> = { 
+      ...changes, 
+      updated_at: new Date().toISOString() 
+    };
+    
+    // 2. Si vienen detalles complejos, hay que volver a stringificarlos
+    // Esto es vital para que no se rompa el JSON en el Sheet
+    if (payload.details) {
+      payload.details_json = JSON.stringify(payload.details);
+      delete payload.details; // Eliminamos el objeto para no guardarlo como [Object object]
+    }
+
+    // 3. Usamos el servicio de sheets para actualizar la fila
+    // Le decimos que busque por la columna 'id'
+    const updated = await this.sheetsService.update(
+      this.SPREADSHEET_ID,
+      this.SHEET_NAME,
+      id,
+      payload,
+      'id'
+    );
+    
+    // 4. Retornamos el objeto mapeado bonito
+    return this.mapRowToBooking(updated);
   }
 
   /**

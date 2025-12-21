@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Patch } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 
@@ -19,5 +19,11 @@ export class BookingsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.bookingsService.findOne(id);
+  }
+
+  // --- NUEVO ENDPOINT PATCH ---
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.bookingsService.update(id, body);
   }
 }
