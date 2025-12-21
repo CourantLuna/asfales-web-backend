@@ -17,7 +17,17 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   
   // La ruta donde verás la documentación (ej: localhost:3000/api/docs)
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'Asfales API Docs',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css',
+    ],
+  });
+
   // -------------------------------
 
   const allowedOrigins = [
