@@ -36,6 +36,7 @@ export class BookingsService {
         payment_method_id: createBookingDto.paymentMethodId || '',
         // 2. Serializamos el objeto details a JSON String
         details_json: JSON.stringify(createBookingDto.details),
+        receipt_data: JSON.stringify(createBookingDto.ReceiptData),
       };
 
       // 3. Guardamos usando el servicio genérico
@@ -100,6 +101,11 @@ export class BookingsService {
       delete payload.details; // Eliminamos el objeto para no guardarlo como [Object object]
     }
 
+    if (payload.ReceiptData) {
+      payload.receipt_data = JSON.stringify(payload.ReceiptData);
+      delete payload.ReceiptData;
+    }
+
     // 3. Usamos el servicio de sheets para actualizar la fila
     // Le decimos que busque por la columna 'id'
     const updated = await this.sheetsService.update(
@@ -119,9 +125,13 @@ export class BookingsService {
    */
   private mapRowToBooking(row: any) {
     let details = {};
+    let receiptData = {};
     try {
       if (row.details_json) {
         details = JSON.parse(row.details_json);
+      }
+      if (row.receipt_data) {
+        receiptData = JSON.parse(row.receipt_data);
       }
     } catch (e) {
       console.warn(`Error parseando JSON para booking ${row.id}`, e);
@@ -130,6 +140,8 @@ export class BookingsService {
     return {
       ...row,
       details, // Reemplazamos el string con el objeto
+      receiptData
+
     };
   }
 }

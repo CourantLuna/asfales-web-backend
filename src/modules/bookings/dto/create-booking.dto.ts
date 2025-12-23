@@ -48,4 +48,7 @@ export class CreateBookingDto {
   // Aquí recibimos el objeto complejo, el servicio lo convertirá a string
   @IsObject()
   details: Record<string, any>;
+
+  @IsObject()
+  ReceiptData: Record<string, any>;
 }
