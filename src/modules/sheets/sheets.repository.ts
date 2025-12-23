@@ -8,7 +8,7 @@ export class SheetsRepository {
 
   async read(spreadsheetId: string, sheetName: string) {
     try {
-      const range = `${sheetName}!A1:Z`;
+      const range = `${sheetName}!A1:ZZ`;
       const resp = await this.sheets.spreadsheets.values.get({
         spreadsheetId,
         range,
