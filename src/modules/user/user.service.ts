@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { SheetsService } from '../sheets/sheets.service';
 import { admin } from '../../firebase/firebase-admin';
 
@@ -73,6 +73,7 @@ export class UserService {
       const newProfile = {
         uid: uid,
         displayName: displayName,
+        userName: displayName ? displayName.toLowerCase().replace(/\s+/g, '') : '',
         email: email,
         gender: 'prefer_not_to_say', // Default
         bio: '',
@@ -177,5 +178,58 @@ async updateAvatar(uid: string, photoURL: string) {
       throw error;
     }
   }
+
+// En user.service.ts
+
+async getUserProfileByUserName(userName: string) {
+  try {
+    // 1. Buscar en Google Sheets
+    const sheetProfile = await this.sheetsService.getById(
+      this.SPREADSHEET_ID,
+      this.PROFILE_SHEET_NAME,
+      userName, 
+      "userName"
+    );
+    
+    if (!sheetProfile) {
+      throw new NotFoundException(`Perfil para @${userName} no encontrado en Sheets`);
+    }
+
+    // console.log(`✅ Perfil encontrado en Sheet. UID: ${sheetProfile.uid}`);
+
+    // 2. Buscar en Firebase Auth
+    let firebaseUser: any = null;
+    try {
+      if (sheetProfile.uid) {
+        // Intentamos obtener el usuario de Firebase
+        firebaseUser = await admin.auth().getUser(sheetProfile.uid);
+        console.log("✅ Usuario encontrado en Firebase Auth.");
+        console.log("📸 Foto en Firebase:", firebaseUser.photoURL ? firebaseUser.photoURL : "No tiene foto");
+      }
+    } catch (firebaseError) {
+      // Si entra aquí, es que el UID del excel no existe en tu proyecto de Firebase
+      console.error("❌ Error o Usuario no encontrado en Firebase:", firebaseError.message);
+    }
+
+    // 3. Mezclar datos (Usamos ?? null para que el JSON no elimine la propiedad)
+    const finalProfile = {
+      ...sheetProfile,
+      // Prioridad: 1. Firebase, 2. Sheet, 3. null (para que no sea undefined)
+      photoURL: firebaseUser?.photoURL ?? sheetProfile.photoURL ?? null,
+      emailVerified: firebaseUser?.emailVerified ?? false,
+      creationTime: firebaseUser?.metadata?.creationTime ?? null,
+      lastSignInTime: firebaseUser?.metadata?.lastSignInTime ?? null,
+      // Forzamos el email de Firebase si el del sheet está vacío
+      displayName: firebaseUser?.displayName ?? sheetProfile.displayName ?? "",
+      email: sheetProfile.email || firebaseUser?.email || ""
+    };
+
+    return finalProfile;
+
+  } catch (error) {
+    console.error("Error fatal en getUserProfileByUserName:", error);
+    throw error;
+  }
+}
   
 }
