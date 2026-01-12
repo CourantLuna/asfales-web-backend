@@ -85,6 +85,7 @@ export class UserService {
         address_json: JSON.stringify(defaultAddress),
         travel_identity_json: JSON.stringify(defaultTravelIdentity),
         loyalty_json: JSON.stringify(defaultLoyalty),
+        
         payment_methods_json: '[]', // Array vacío
         companions_json: '[]',      // Array vacío
         notif_prefs: JSON.stringify(defaultNotifs)

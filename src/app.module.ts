@@ -9,6 +9,7 @@ import { UserModule } from './modules/user/user.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 
 @Module({
   imports: [AuthModule, 
@@ -16,7 +17,7 @@ import { ExperiencesModule } from './modules/experiences/experiences.module';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'], // .env.local si NODE_ENV=local
     }),
-    SheetsModule, UserModule, FavoritesModule, BookingsModule, ExperiencesModule
+    SheetsModule, UserModule, FavoritesModule, BookingsModule, ExperiencesModule, StripeModule
   ],
   controllers: [AppController,UsersController],
   providers: [AppService],
