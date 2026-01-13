@@ -24,19 +24,14 @@ export class StripeService {
   async createSetupIntent(customerId: string) {
     return this.stripe.setupIntents.create({
       customer: customerId,
-      // 1. Usamos MANUALMENTE los tipos permitidos
-      // 'card' -> Incluye Visa, MC, Amex, Apple Pay y Google Pay
-      // 'paypal' -> Incluye PayPal
-      payment_method_types: ['apple_pay', 'google_pay', 'card'], 
-      
-      // 2. Eliminamos 'automatic_payment_methods' para evitar conflictos
-      // 3. Opciones extra para optimizar seguridad en tarjetas
-      payment_method_options: {
-        card: {
-          request_three_d_secure: 'automatic',
-        },
+      automatic_payment_methods: { 
+        enabled: true,
+        allow_redirects: 'always' 
       },
-      usage: 'off_session', 
+      // 👇 AQUÍ VINCULAMOS TU CONFIGURACIÓN DEL DASHBOARD
+      payment_method_configuration: 'pmc_1Sos9Q1QR5f5UW0YgmqkPp6S', 
+      
+      usage: 'off_session',
     });
   }
 
@@ -63,8 +58,13 @@ export class StripeService {
       payment_method: paymentMethodId,
       off_session: true,
       confirm: true,
-      // Si usas tipos específicos arriba, es bueno mantener coherencia, 
-      // pero para cobrar una tarjeta YA guardada, esto suele bastar.
+      automatic_payment_methods: { 
+        enabled: true,
+        allow_redirects: 'never' 
+      },
+      // 👇 TAMBIÉN AQUÍ (Opcional, si quieres que apliquen las mismas reglas al cobrar)
+      payment_method_configuration: 'pmc_1Sos9Q1QR5f5UW0YgmqkPp6S', 
+      
       return_url: 'http://localhost:3000/payment-success', 
     });
   }

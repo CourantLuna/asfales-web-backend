@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { SheetsService } from '../sheets/sheets.service';
 import { admin } from '../../firebase/firebase-admin';
+import { StripeService } from '../stripe/stripe.service';
 
 @Injectable()
 export class UserService {
@@ -8,7 +9,7 @@ export class UserService {
   private readonly SPREADSHEET_ID = '1T4Vtp2QAE30iNh4vc4DkzV0TRmHio0FcORpqx59G2E0';
   private readonly PROFILE_SHEET_NAME = 'perfil';
 
-  constructor(private sheetsService: SheetsService) {}
+  constructor(private sheetsService: SheetsService, private stripeService: StripeService) {}
 
   async getUserProfile(uid: string) {
     try {
@@ -69,6 +70,18 @@ export class UserService {
       const defaultAddress = { street: "", city: "", state: "", zipCode: "", country: "" };
       const defaultTravelIdentity = { passportNumber: "", homeAirport: "" };
 
+      let customerId = "";
+
+    // 2. SI NO TENÍAMOS EL ID, LO BUSCAMOS/CREAMOS EN STRIPE
+    if (!customerId) {
+      const customer = 
+          await this.stripeService.createOrGetCustomer(
+            email || "",
+            displayName ? displayName.toLowerCase().replace(/\s+/g, '') : ''
+          );
+      customerId = customer.id;
+    }
+
       // 2. Construir el objeto plano que coincide con tus columnas del Excel
       const newProfile = {
         uid: uid,
@@ -86,6 +99,7 @@ export class UserService {
         travel_identity_json: JSON.stringify(defaultTravelIdentity),
         loyalty_json: JSON.stringify(defaultLoyalty),
         
+        stripeCustomerId: customerId,
         payment_methods_json: '[]', // Array vacío
         companions_json: '[]',      // Array vacío
         notif_prefs: JSON.stringify(defaultNotifs)

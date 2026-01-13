@@ -3,9 +3,10 @@ import { UsersController } from './users.controller';
 import { UserService } from './user.service';
 import { SheetsModule } from '../sheets/sheets.module'; // Importante
 import { AsfalesUserController } from './asfales-user.controller';
+import { StripeModule } from '../stripe/stripe.module';
 
 @Module({
-  imports: [SheetsModule], // Importamos el módulo que contiene el servicio de Sheets
+  imports: [SheetsModule, StripeModule], // Importamos el módulo que contiene el servicio de Sheets
   controllers: [UsersController, AsfalesUserController],
   providers: [UserService],
   exports: [UserService],

@@ -1,12 +1,12 @@
 import { Body, Controller, Post, Get, Query, BadRequestException } from '@nestjs/common';
 import { StripeService } from './stripe.service';
-import { UserService } from '../user/user.service'; // Importar UserService
+import { GetUserService } from '../user/getUser.service';
 
 @Controller('stripe')
 export class StripeController {
   constructor(
     private readonly stripeService: StripeService,
-    private readonly userService: UserService // Inyectar UserService
+    private readonly GetUserService: GetUserService // Inyectar UserService
   ) {}
 
 @Post('create-setup-intent')
@@ -19,7 +19,7 @@ export class StripeController {
 
     // 1. INTENTO LEER DE LA HOJA DE CÁLCULO PRIMERO (Optimización) ⚡
     try {
-      const profile = await this.userService.getUserProfile(body.uid);
+      const profile = await this.GetUserService.getUserProfile(body.uid);
       if (profile && profile['stripeCustomerId']) {
         customerId = profile['stripeCustomerId'];
         console.log(`✅ Usando cliente existente de DB: ${customerId}`);
@@ -29,14 +29,14 @@ export class StripeController {
       console.warn("No se pudo verificar perfil local, buscando en Stripe...");
     }
 
-    // 2. SI NO TENÍAMOS EL ID, LO BUSCAMOS/CREAMOS EN STRIPE
+     // 2. SI NO TENÍAMOS EL ID, LO BUSCAMOS/CREAMOS EN STRIPE
     if (!customerId) {
       const customer = await this.stripeService.createOrGetCustomer(body.email, body.name);
       customerId = customer.id;
 
       // Y lo guardamos para la próxima
       try {
-        await this.userService.updateUserProfile(body.uid, { 
+        await this.GetUserService.updateUserProfile(body.uid, { 
             stripeCustomerId: customerId 
         });
         console.log(`💾 Nuevo Stripe ID ${customerId} guardado en perfil.`);
@@ -44,6 +44,7 @@ export class StripeController {
         console.error("⚠️ Error guardando en Excel:", error.message);
       }
     }
+
 
     // 3. Crear el SetupIntent con el ID (sea recuperado o nuevo)
     const setupIntent = await this.stripeService.createSetupIntent(customerId);
@@ -61,7 +62,7 @@ export class StripeController {
     // Si el frontend no manda el customerId (primera vez), intentamos buscarlo en la hoja
     if (!finalCustomerId && uid) {
         try {
-            const profile = await this.userService.getUserProfile(uid);
+            const profile = await this.GetUserService.getUserProfile(uid);
             if (profile && profile['stripeCustomerId']) {
                 finalCustomerId = profile['stripeCustomerId'];
             }
@@ -77,4 +78,5 @@ export class StripeController {
     const methods = await this.stripeService.listPaymentMethods(finalCustomerId);
     return methods;
   }
+  
 }
