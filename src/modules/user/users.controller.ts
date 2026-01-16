@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { FirebaseAuthGuard } from '../../guards/firebase-auth.guard';
 import { Post } from '@nestjs/common';
 
-@Controller('perfil') // Esto define la ruta base: http://localhost:3001/perfil
+@Controller('perfil') // Esto define la ruta base.
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
