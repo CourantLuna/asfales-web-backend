@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Query, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, Get, Query, BadRequestException, Delete, Param } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { GetUserService } from '../user/getUser.service';
 import { MetadataParam } from '@stripe/stripe-js';
@@ -101,6 +101,15 @@ export class StripeController {
       throw new BadRequestException(error.message);
     }
   }
+
   
+  @Delete('payment-methods/:id')
+  async detachPaymentMethod(@Param('id') id: string) {
+    try {
+      return await this.stripeService.detachPaymentMethod(id);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
   
 }

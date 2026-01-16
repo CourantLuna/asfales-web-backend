@@ -37,7 +37,6 @@ export class StripeService {
     });
   }
 
-  // --- CORRECCIÓN 2: Listar Múltiples Tipos ---
   async listPaymentMethods(customerId: string) {
     // Stripe no permite pedir ['card', 'paypal'] en una sola llamada.
     // Debemos pedir las listas por separado y unirlas.
@@ -72,4 +71,16 @@ export class StripeService {
       return_url: 'http://localhost:3000/payment-success', 
     });
   }
+
+
+  async detachPaymentMethod(paymentMethodId: string) {
+    try {
+      // "Detach" elimina la asociación entre la tarjeta y el Customer
+      const paymentMethod = await this.stripe.paymentMethods.detach(paymentMethodId);
+      return paymentMethod; 
+    } catch (error) {
+      throw new Error(`Error detaching payment method: ${error.message}`);
+    }
+  }
+
 }
