@@ -1,7 +1,7 @@
 export class RegisterUserDto {
   uid?: string;                // opcional
   email: string;               // obligatorio
-  password: string;            // obligatorio, mínimo 6 caracteres
+  password: string;            // obligatorio, mínimo 8 caracteres
   displayName?: string;        // opcional
   phoneNumber?: string;        // opcional, formato E.164
   photoURL?: string;           // opcional
