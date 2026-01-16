@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Get, Query, BadRequestException } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { GetUserService } from '../user/getUser.service';
+import { MetadataParam } from '@stripe/stripe-js';
 
 @Controller('stripe')
 export class StripeController {
@@ -78,5 +79,28 @@ export class StripeController {
     const methods = await this.stripeService.listPaymentMethods(finalCustomerId);
     return methods;
   }
+
+  @Post('create-payment-intent')
+  async createPaymentIntent(@Body() body: { amount: number; currency: string; customerId: string; paymentMethodId: string, description: string, metadata: MetadataParam }) {
+    try {
+      const intent = await this.stripeService.createPaymentIntent(
+        body.amount,
+        body.currency,
+        body.customerId,
+        body.paymentMethodId,
+        body.description, body.metadata
+      );
+      
+      return { 
+        clientSecret: intent.client_secret,
+        status: intent.status,
+        id: intent.id
+      };
+    } catch (error) {
+      // Manejamos errores de Stripe (ej: fondos insuficientes) para devolverlos limpios al front
+      throw new BadRequestException(error.message);
+    }
+  }
+  
   
 }

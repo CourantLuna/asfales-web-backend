@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MetadataParam } from '@stripe/stripe-js';
+import { metadata } from 'reflect-metadata/no-conflict';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -50,14 +52,16 @@ export class StripeService {
     return [...cards.data].sort((a, b) => b.created - a.created);
   }
 
-  async createPaymentIntent(amount: number, currency: string, customerId?: string, paymentMethodId?: string) {
+  async createPaymentIntent(amount: number, currency: string, customerId?: string, paymentMethodId?: string, description?: string, metadata?: MetadataParam) {
     return this.stripe.paymentIntents.create({
       amount: Math.round(amount * 100),
       currency,
       customer: customerId,
       payment_method: paymentMethodId,
+      description: description,
+      metadata: metadata || undefined,
       off_session: true,
-      confirm: true,
+      confirm: true, // Intenta cobrar inmediatamente
       automatic_payment_methods: { 
         enabled: true,
         allow_redirects: 'never' 
