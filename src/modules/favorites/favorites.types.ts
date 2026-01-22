@@ -30,6 +30,8 @@ export interface FavoriteItem {
       currency: string;
       period?: string; // 'night' | 'trip'
     };
+    startDate?: string; // ISO Date
+    endDate?: string; // ISO Date
   };
 }
 export interface FullListData extends FavoriteList {

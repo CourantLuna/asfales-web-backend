@@ -10,6 +10,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
 import { StripeModule } from './modules/stripe/stripe.module';
+import { ItinerariesModule } from './modules/itineraries/itineraries.module';
 
 @Module({
   imports: [AuthModule, 
@@ -17,7 +18,7 @@ import { StripeModule } from './modules/stripe/stripe.module';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'], // .env.local si NODE_ENV=local
     }),
-    SheetsModule, UserModule, FavoritesModule, BookingsModule, ExperiencesModule, StripeModule
+    SheetsModule, UserModule, FavoritesModule, BookingsModule, ExperiencesModule, StripeModule, ItinerariesModule
   ],
   controllers: [AppController,UsersController],
   providers: [AppService],
