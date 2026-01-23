@@ -48,7 +48,8 @@ private readonly logger = new Logger(FavoritesService.name);
       snap_price_period: resourceData.snapshot.pricePreview.period,
       added_at: new Date().toISOString(),
       snap_start_date: resourceData.snapshot.startDate || '',
-      snap_end_date: resourceData.snapshot.endDate || ''
+      snap_end_date: resourceData.snapshot.endDate || '',
+      paxPerUnit: resourceData.snapshot.paxPerUnit || undefined,
     };
 
       // this.logger.log(`añadiendo a la lista ${listId}..., los recursos: `, newItem);
@@ -110,6 +111,7 @@ async getFullListDetails(listId: string): Promise<FullListData> {
       },
       startDate: item.snap_start_date || undefined,
       endDate: item.snap_end_date || undefined,
+      paxPerUnit: item.paxPerUnit ? parseInt(item.paxPerUnit, 10) : undefined,
     }
   }));
 
@@ -150,6 +152,7 @@ async getAllUserListsWithItems(userId: string): Promise<FullListData[]> {
             currency: item.snap_currency,
             period: item.snap_price_period
           },
+          paxPerUnit: item.paxPerUnit ? parseInt(item.paxPerUnit, 10) : undefined,
           startDate: item.snap_start_date || undefined,
           endDate: item.snap_end_date || undefined,
         }

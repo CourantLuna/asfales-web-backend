@@ -32,6 +32,7 @@ export interface FavoriteItem {
     };
     startDate?: string; // ISO Date
     endDate?: string; // ISO Date
+    paxPerUnit?: number; // Número de personas por unidad (si aplica)
   };
 }
 export interface FullListData extends FavoriteList {
