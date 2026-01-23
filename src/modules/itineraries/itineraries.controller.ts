@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Patch, Put } from '@nestjs/common';
 import { ItinerariesService } from './itineraries.service';
 
 @Controller('itineraries')
@@ -15,8 +15,18 @@ export class ItinerariesController {
     return this.itinerariesService.findByOwner(uid);
   }
 
+  @Get(':id')
+  getById(@Param('id') id: string) {
+    return this.itinerariesService.findById(id);
+  }
+
   @Post()
   create(@Body() body: any) {
     return this.itinerariesService.create(body);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateData: Record<string, any>) {
+    return this.itinerariesService.update(id, updateData);
   }
 }

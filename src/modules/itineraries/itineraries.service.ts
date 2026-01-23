@@ -32,6 +32,33 @@ export class ItinerariesService {
     });
   }
 
+  // Obtener un itinerario por ID
+  async findById(id: string) {
+    const allItineraries = await this.findAll();
+    
+    // Buscamos el itinerario que coincida con el ID
+    const itinerary = allItineraries.find((item) => item['id'] === id);
+    
+    if (!itinerary) {
+      throw new Error(`Itinerario con ID ${id} no encontrado`);
+    }
+    
+    return itinerary;
+  }
+
+  // Actualizar un itinerario por ID (dinámicamente)
+  async update(id: string, updateData: Record<string, any>) {
+    // Llamamos al método update del SheetsService
+    // El updateData puede contener cualquier campo del itinerario
+    return this.sheetsService.update(
+      this.SPREADSHEET_ID,
+      this.SHEET_NAME,
+      id,
+      updateData,
+      'id' // columna clave para buscar
+    );
+  }
+
   // Crear un nuevo itinerario
   async create(itineraryData: any) {
     // Aquí podrías agregar lógica para serializar objetos complejos a JSON strings
